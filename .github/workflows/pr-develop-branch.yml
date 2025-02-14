@@ -33,6 +33,8 @@ jobs:
 
       - name: "Checkout source code"
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: "Populate auth file with SFDX_URL secret of integration org"
         shell: bash
@@ -45,7 +47,7 @@ jobs:
       - name: "Create delta packages"
         run: |
           mkdir changed-sources
-          sf sgd source delta --to "HEAD" --from "HEAD^" --output changed-sources/ --generate-delta --source force-app/
+          sf sgd source delta --to "HEAD" --from "HEAD^" -o changed-sources/ --generate-delta -s force-app/
 
       - name: "Check-only deploy delta changes"
         id: deploy
