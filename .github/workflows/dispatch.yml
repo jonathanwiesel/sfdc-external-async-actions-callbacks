@@ -1,0 +1,106 @@
+name: Repository Dispatch
+on:
+  repository_dispatch:
+    types: [deploy-check]
+jobs:
+  fetch-deploy-validation-results:
+    runs-on: trailheadapps-Ubuntu
+    permissions:
+      checks: write
+    steps:
+      - name: "Install Salesforce CLI"
+        run: |
+          npm install @salesforce/cli --location=global
+          nodeInstallPath=$(npm config get prefix)
+          echo "$nodeInstallPath/bin" >> $GITHUB_PATH
+          sf --version
+
+      - name: "Populate auth file with SFDX_URL secret of integration org"
+        shell: bash
+        run: |
+          echo ${{ secrets.SFDX_INTEGRATION_URL }} > ./SFDX_INTEGRATION_URL.txt
+
+      - name: "Authenticate to Integration Org"
+        run: sf org login sfdx-url -f ./SFDX_INTEGRATION_URL.txt -a integration -d
+
+      - name: "Get validation result"
+        id: result
+        run: |
+          RESULT=$(sf project deploy report --job-id ${{ github.event.client_payload.actionId }} --json)
+          echo "validationResult=$RESULT" >> $GITHUB_OUTPUT
+
+      - name: "Build validation errors ouput"
+        id: component_errors
+        run: |
+          if [ "$(jq '.result.details.componentFailures | length' <<< "${{ steps.result.validationResult }}")" -gt 0 ]; then
+            FAILURES=$(jq -r '
+              "
+              ## Component Errors
+
+              | Full Name                | Component Type | Problem                                 | Line | Column |
+              |--------------------------|----------------|-----------------------------------------|------|--------|
+              " +
+              (.result.details.componentFailures[] |
+              "| \(.fullName) | \(.componentType) | \(.problem) | \(.lineNumber) | \(.columnNumber) |")
+            ' <<< ${{ steps.result.validationResult }})
+          fi
+
+          echo "output=$FAILURES" >> $GITHUB_OUTPUT
+
+      - name: "Build validation successes ouput"
+        id: component_successes
+        run: |
+          if [ "$(jq '.result.details.componentSuccesses[] | select(.fullName != "package.xml") | length' <<< "${{ steps.result.validationResult }}")" -gt 0 ]; then
+            SUCCESSES=$(jq -r '
+              "
+              ## Component Successes
+
+              | Full Name                | Component Type |
+              |--------------------------|----------------|
+              " +
+              (.result.details.componentSuccesses[] | select(.fullName != "package.xml") | 
+              "| \(.fullName) | \(.componentType) |")
+            ' <<< ${{ steps.result.validationResult }})
+          fi
+
+          echo "output=$SUCCESSES" >> $GITHUB_OUTPUT
+
+      - name: "Build test errors ouput"
+        id: test_errors
+        run: |
+          if [ "$(jq '.result.details.runTestResult.failures | length' <<< "${{ steps.result.validationResult }}")" -gt 0 ]; then
+            TEST_FAILURES=$(jq -r '
+              "
+              ## Test Errors
+
+              | Class                | Method         | Message                                 | Stack         |
+              |----------------------|----------------|-----------------------------------------|---------------|
+              " +
+              (.result.details.runTestResult.failures[] |
+              "| \(.name) | \(.methodName) | \(.message) | \(.stackTrace) |")
+            ' <<< ${{ steps.result.validationResult }})
+          fi
+
+          echo "output=$TEST_FAILURES" >> $GITHUB_OUTPUT
+
+      - name: "Update check run"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          STATUS: $( ${{ steps.result.validationResult }} | jq '.result.success' | if . then "success" else "failure" end )
+          COMPLETION_DATE: $( ${{ steps.result.validationResult }} | jq '.result.completedDate' )
+          MARKDOWN_CONTENT: |
+            # Validation Summary\n\n
+
+            ${{ steps.component_errors.output }}\n\n
+
+            ${{ steps.component_successes.output }}\n\n
+
+            ${{ steps.test_errors.output }}
+        run: |
+          gh api -X PATCH -H "Accept: application/vnd.github+json" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          -f 'conclusion=${{ env.STATUS }}' \ 
+          -f 'completed_at=${{ env.COMPLETION_DATE }}'
+          -f 'output[title]="Validation Results"' \
+          -f 'output[summary]="${{ env. MARKDOWN_CONTENT }}"' \
+          /repos/${{ github.repository }}/check-runs/${{ github.event.client_payload.checkRunId }}

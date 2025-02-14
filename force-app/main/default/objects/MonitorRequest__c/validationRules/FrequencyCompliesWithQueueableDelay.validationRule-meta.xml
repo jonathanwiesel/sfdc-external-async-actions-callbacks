@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FrequencyCompliesWithQueueableDelay</fullName>
+    <active>true</active>
+    <errorConditionFormula>MonitorFrequency__c &lt; 1 || MonitorFrequency__c &gt; 10</errorConditionFormula>
+    <errorDisplayField>MonitorFrequency__c</errorDisplayField>
+    <errorMessage>Monitor frequency should be between 1 and 10 minutes</errorMessage>
+</ValidationRule>

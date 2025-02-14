@@ -1,0 +1,7 @@
+{
+  "name": "salesforce-app",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Salesforce Deployment Callbacks",
+  "scripts": {}
+}
