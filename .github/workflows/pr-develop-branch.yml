@@ -47,7 +47,7 @@ jobs:
       - name: "Create delta packages"
         run: |
           mkdir changed-sources
-          sf sgd source delta --to "HEAD" --from "HEAD^" -o changed-sources/ --generate-delta -s force-app/
+          sf sgd source delta --to "HEAD" --from "origin/develop" -o changed-sources/ --generate-delta -s force-app/
 
       - name: "Check-only deploy delta changes"
         id: deploy
