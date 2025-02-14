@@ -11,6 +11,7 @@ jobs:
   validate-deployment-on-develop-org:
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       checks: write
     steps:
       - name: "Install node"
@@ -32,8 +33,6 @@ jobs:
 
       - name: "Checkout source code"
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.client_payload.ref }}
 
       - name: "Populate auth file with SFDX_URL secret of integration org"
         shell: bash
