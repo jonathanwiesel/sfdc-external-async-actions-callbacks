@@ -9,10 +9,15 @@ on:
 
 jobs:
   validate-deployment-on-develop-org:
-    runs-on: trailheadapps-Ubuntu
+    runs-on: ubuntu-latest
     permissions:
       checks: write
     steps:
+      - name: "Install node"
+        uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+      
       - name: "Install Salesforce CLI"
         run: |
           npm install @salesforce/cli --location=global
