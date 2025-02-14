@@ -48,10 +48,12 @@ jobs:
         run: |
           mkdir changed-sources
           sf sgd source delta --to "HEAD" --from "origin/develop" -o changed-sources/ --generate-delta -s force-app/
+          tree changed-sources
 
       - name: "Check-only deploy delta changes"
         id: deploy
         run: |
+          sf project deploy start -d "changed-sources/force-app" -l RunLocalTests --dry-run --json --async
           DEPLOY_RESULT=$(sf project deploy start -d "changed-sources/force-app" -l RunLocalTests --dry-run --json --async)
           DEPLOYID=$(echo $DEPLOY_RESULT | jq '.result.id')
           DEPLOYURL=$(echo $DEPLOY_RESULT | jq '.result.deployUrl')
