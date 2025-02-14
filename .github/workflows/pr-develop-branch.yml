@@ -81,10 +81,10 @@ jobs:
           MONITOR_REQUEST_FREQUENCY: 10,
         run: |
           sf data create record --sobject MonitorRequest__c \
-          --values "ActionId__c='${{ steps.deploy.outputs.deploymentId }}' \
-          ActionType='Deploy' \
+          --values "ActionId__c=${{ steps.deploy.outputs.deploymentId }} \
+          ActionType__c='Deploy' \
           MonitorFrequency__c=${{ env.MONITOR_REQUEST_FREQUENCY }} \
           Provider__c='Github' \
           ParentId__c='${{ github.event.number }}' \
-          SourceData__c='{/"checkRunId/": /"${{ steps.checkrun.outputs.checkId }}/", /"repo/": /"${{ github.repository }}/", /"eventType/": /"deploy-check/"}' \
+          SourceData__c='{"checkRunId": "${{ steps.checkrun.outputs.checkId }}", "repo": "${{ github.repository }}", "eventType": "deploy-check"}' \
           SourceId__c='${{ github.event.pull_request.head.sha }}'"
