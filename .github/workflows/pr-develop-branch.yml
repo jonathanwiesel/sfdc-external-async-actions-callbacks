@@ -53,8 +53,8 @@ jobs:
       - name: "Check-only deploy delta changes"
         id: deploy
         run: |
-          sf project deploy start -d "changed-sources/force-app" -l RunLocalTests --dry-run --json --async
-          DEPLOY_RESULT=$(sf project deploy start -d "changed-sources/force-app" -l RunLocalTests --dry-run --json --async)
+          sf project deploy start -d "changed-sources/force-app" -l RunLocalTests --dry-run --json --async --ignore-conflict
+          DEPLOY_RESULT=$(sf project deploy start -d "changed-sources/force-app" -l RunLocalTests --dry-run --json --async --ignore-conflict)
           DEPLOYID=$(echo $DEPLOY_RESULT | jq '.result.id')
           DEPLOYURL=$(echo $DEPLOY_RESULT | jq '.result.deployUrl')
           echo "deploymentId=$DEPLOYID" >> $GITHUB_OUTPUT
