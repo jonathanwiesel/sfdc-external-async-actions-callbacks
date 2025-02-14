@@ -53,7 +53,6 @@ jobs:
       - name: "Check-only deploy delta changes"
         id: deploy
         run: |
-          sf project deploy start -d "changed-sources/force-app" -l RunLocalTests --dry-run --json --async --ignore-conflicts
           DEPLOY_RESULT=$(sf project deploy start -d "changed-sources/force-app" -l RunLocalTests --dry-run --json --async --ignore-conflicts)
           DEPLOYID=$(echo $DEPLOY_RESULT | jq '.result.id')
           DEPLOYURL=$(echo $DEPLOY_RESULT | jq '.result.deployUrl')
@@ -78,12 +77,12 @@ jobs:
 
       - name: "Monitor deployment externally"
         env:
-          MONITOR_REQUEST_FREQUENCY: 10,
+          MONITOR_REQUEST_FREQUENCY: 10
         run: |
           sf data create record --sobject MonitorRequest__c \
           --values "ActionId__c=${{ steps.deploy.outputs.deploymentId }} \
           ActionType__c='Deploy' \
-          MonitorFrequency__c='${{ env.MONITOR_REQUEST_FREQUENCY }}' \
+          MonitorFrequency__c=${{ env.MONITOR_REQUEST_FREQUENCY }} \
           Provider__c='Github' \
           ParentId__c='${{ github.event.number }}' \
           SourceData__c='{/"checkRunId/": /"${{ steps.checkrun.outputs.checkId }}/", /"repo/": /"${{ github.repository }}/", /"eventType/": /"deploy-check/"}' \
