@@ -69,8 +69,8 @@ jobs:
           -H "X-GitHub-Api-Version: 2022-11-28" \
           -f name='Check Deployment' \
           -f head_sha='${{ github.event.pull_request.head.sha }}' \
-          -f details_url='${{ steps.deploy.outputs.deploymentURL }}'
-          -f external_id='${{ steps.deploy.outputs.deploymentId }}'
+          -f details_url='${{ steps.deploy.outputs.deploymentURL }}' \
+          -f external_id='${{ steps.deploy.outputs.deploymentId }}' \
           --jq '.id' \
           /repos/${{ github.repository }}/check-runs)
 
