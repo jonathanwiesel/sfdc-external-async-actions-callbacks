@@ -36,7 +36,7 @@ private class GithubActionStatusNotifierTest {
     }
 
     @isTest static void testNotifySuccess() {
-
+        Assert.fail('You should fail');
     }
 
     @isTest static void testNotifyError() {
