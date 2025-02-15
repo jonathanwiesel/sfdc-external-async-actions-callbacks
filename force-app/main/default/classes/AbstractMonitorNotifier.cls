@@ -17,7 +17,7 @@ public with sharing abstract class AbstractMonitorNotifier {
 
         if (mockedNotifier != null) return mockedNotifier;
 
-        NotifierConfig__mdt[] configs = [SELECT HandlerApexClass__c 
+        NotifierConfig__mdt[] configs = [SELECT HandlerApexClass__c, NamedCredential__c
                                             FROM NotifierConfig__mdt 
                                             WHERE Provider__c = :request.Provider__c];
 
