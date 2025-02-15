@@ -4,10 +4,16 @@ on:
     types: [deploy-check]
 jobs:
   fetch-deploy-validation-results:
-    runs-on: trailheadapps-Ubuntu
+    runs-on: ubuntu-latest
     permissions:
+      contents: read
       checks: write
     steps:
+      - name: "Install node"
+        uses: actions/setup-node@v3
+        with:
+          node-version: '23'
+          
       - name: "Install Salesforce CLI"
         run: |
           npm install @salesforce/cli --location=global
