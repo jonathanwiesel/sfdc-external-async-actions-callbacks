@@ -28,19 +28,16 @@ jobs:
 
       - name: "Authenticate to Integration Org"
         run: sf org login sfdx-url -f ./SFDX_INTEGRATION_URL.txt -a integration -s
-
+  
       - name: "Get validation result"
-        id: result
         run: |
           RESULT=$(sf project deploy report --job-id ${{ github.event.client_payload.actionId }} --json)
-          echo "validationResult<<EOF" >> "$GITHUB_OUTPUT"
-          echo "$RESULT" >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
+          echo $RESULT > ./DEPLOY_RESULT.json
 
       - name: "Build validation errors ouput"
         id: component_errors
         run: |
-          if [ "$(jq '.result.details.componentFailures | length' <<< "${{ steps.result.outputs.validationResult }}")" -gt 0 ]; then
+          if [ "$(jq '.result.details.componentFailures | length' ./DEPLOY_RESULT.json ")" -gt 0 ]; then
             FAILURES=$(jq -r '
               "
               ## Component Errors
@@ -50,7 +47,7 @@ jobs:
               " +
               (.result.details.componentFailures[] |
               "| \(.fullName) | \(.componentType) | \(.problem) | \(.lineNumber) | \(.columnNumber) |")
-            ' <<< "${{ steps.result.outputs.validationResult }}")
+            ' ./DEPLOY_RESULT.json)
           fi
 
           echo "content<<EOF" >> "$GITHUB_OUTPUT"
@@ -60,7 +57,7 @@ jobs:
       - name: "Build validation successes ouput"
         id: component_successes
         run: |
-          if [ "$(jq '.result.details.componentSuccesses[] | select(.fullName != "package.xml") | length' <<< "${{ steps.result.outputs.validationResult }}")" -gt 0 ]; then
+          if [ "$(jq '.result.details.componentSuccesses[] | select(.fullName != "package.xml") | length' <./DEPLOY_RESULT.json)" -gt 0 ]; then
             SUCCESSES=$(jq -r '
               "
               ## Component Successes
@@ -70,7 +67,7 @@ jobs:
               " +
               (.result.details.componentSuccesses[] | select(.fullName != "package.xml") | 
               "| \(.fullName) | \(.componentType) |")
-            ' <<< "${{ steps.result.outputs.validationResult }}")
+            ' <<< ./DEPLOY_RESULT.json)
           fi
 
           echo "content<<EOF" >> "$GITHUB_OUTPUT"
@@ -80,7 +77,7 @@ jobs:
       - name: "Build test errors ouput"
         id: test_errors
         run: |
-          if [ "$(jq '.result.details.runTestResult.failures | length' <<< "${{ steps.result.outputs.validationResult }}")" -gt 0 ]; then
+          if [ "$(jq '.result.details.runTestResult.failures | length' ./DEPLOY_RESULT.json)" -gt 0 ]; then
             TEST_FAILURES=$(jq -r '
               "
               ## Test Errors
@@ -90,7 +87,7 @@ jobs:
               " +
               (.result.details.runTestResult.failures[] |
               "| \(.name) | \(.methodName) | \(.message) | \(.stackTrace) |")
-            ' <<< "${{ steps.result.outputs.validationResult }}")
+            ' ./DEPLOY_RESULT.json)
           fi
 
           echo "content<<EOF" >> "$GITHUB_OUTPUT"
@@ -100,8 +97,6 @@ jobs:
       - name: "Update check run"
         env:
           GH_TOKEN: ${{ github.token }}
-          STATUS: $( ${{ steps.result.validationResult }} | jq '.result.success' | if . then "success" else "failure" end )
-          COMPLETION_DATE: $( ${{ steps.result.outputs.validationResult }} | jq '.result.completedDate' )
           MARKDOWN_CONTENT: |
             # Validation Summary\n\n
 
@@ -111,6 +106,9 @@ jobs:
 
             ${{ steps.test_errors.outputs.content }}
         run: |
+          STATUS=$(jq '.result.success | if . then "success" else "failure" end' ./DEPLOY_RESULT.json )
+          COMPLETION_DATE=$(jq '.result.completedDate' ./DEPLOY_RESULT.json)
+
           gh api -X PATCH -H "Accept: application/vnd.github+json" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
           -f 'conclusion=${{ env.STATUS }}' \ 
