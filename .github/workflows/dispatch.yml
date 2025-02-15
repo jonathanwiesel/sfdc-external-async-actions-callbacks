@@ -57,7 +57,7 @@ jobs:
       - name: "Build validation successes ouput"
         id: component_successes
         run: |
-          if [ "$(jq '.result.details.componentSuccesses[] | select(.fullName != "package.xml") | length' <./DEPLOY_RESULT.json)" -gt 0 ]; then
+          if [ "$(jq '.result.details.componentSuccesses[] | select(.fullName != "package.xml") | length' ./DEPLOY_RESULT.json)" -gt 0 ]; then
             SUCCESSES=$(jq -r '
               "
               ## Component Successes
@@ -98,11 +98,11 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           MARKDOWN_CONTENT: |
-            # Validation Summary\n\n
+            # Validation Summary
 
-            ${{ steps.component_errors.outputs.content }}\n\n
+            ${{ steps.component_errors.outputs.content }}
 
-            ${{ steps.component_successes.outputs.content }}\n\n
+            ${{ steps.component_successes.outputs.content }}
 
             ${{ steps.test_errors.outputs.content }}
         run: |
@@ -111,8 +111,8 @@ jobs:
 
           gh api -X PATCH -H "Accept: application/vnd.github+json" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
-          -f 'conclusion=${{ env.STATUS }}' \ 
-          -f 'completed_at=${{ env.COMPLETION_DATE }}'
+          -f 'conclusion=$STATUS' \ 
+          -f 'completed_at=$COMPLETION_DATE'
           -f 'output[title]="Validation Results"' \
-          -f 'output[summary]="${{ env. MARKDOWN_CONTENT }}"' \
+          -f 'output[summary]="${{ env.MARKDOWN_CONTENT }}"' \
           /repos/${{ github.repository }}/check-runs/${{ github.event.client_payload.checkRunId }}
