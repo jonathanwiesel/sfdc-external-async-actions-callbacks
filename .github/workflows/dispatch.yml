@@ -40,7 +40,7 @@ jobs:
       - name: "Build validation errors ouput"
         id: component_errors
         run: |
-          if [ "$(jq '.result.details.componentFailures | length' <<< "${{ steps.result.validationResult }}")" -gt 0 ]; then
+          if [ "$(jq '.result.details.componentFailures | length' <<< "${{ steps.result.outputs.validationResult }}")" -gt 0 ]; then
             FAILURES=$(jq -r '
               "
               ## Component Errors
@@ -50,15 +50,15 @@ jobs:
               " +
               (.result.details.componentFailures[] |
               "| \(.fullName) | \(.componentType) | \(.problem) | \(.lineNumber) | \(.columnNumber) |")
-            ' <<< ${{ steps.result.validationResult }})
+            ' <<< ${{ steps.result.outputs.validationResult }})
           fi
 
-          echo "output=$FAILURES" >> $GITHUB_OUTPUT
+          echo "content=$FAILURES" >> $GITHUB_OUTPUT
 
       - name: "Build validation successes ouput"
         id: component_successes
         run: |
-          if [ "$(jq '.result.details.componentSuccesses[] | select(.fullName != "package.xml") | length' <<< "${{ steps.result.validationResult }}")" -gt 0 ]; then
+          if [ "$(jq '.result.details.componentSuccesses[] | select(.fullName != "package.xml") | length' <<< "${{ steps.result.outputs.validationResult }}")" -gt 0 ]; then
             SUCCESSES=$(jq -r '
               "
               ## Component Successes
@@ -68,15 +68,15 @@ jobs:
               " +
               (.result.details.componentSuccesses[] | select(.fullName != "package.xml") | 
               "| \(.fullName) | \(.componentType) |")
-            ' <<< ${{ steps.result.validationResult }})
+            ' <<< ${{ steps.result.outputs.validationResult }})
           fi
 
-          echo "output=$SUCCESSES" >> $GITHUB_OUTPUT
+          echo "content=$SUCCESSES" >> $GITHUB_OUTPUT
 
       - name: "Build test errors ouput"
         id: test_errors
         run: |
-          if [ "$(jq '.result.details.runTestResult.failures | length' <<< "${{ steps.result.validationResult }}")" -gt 0 ]; then
+          if [ "$(jq '.result.details.runTestResult.failures | length' <<< "${{ steps.result.outputs.validationResult }}")" -gt 0 ]; then
             TEST_FAILURES=$(jq -r '
               "
               ## Test Errors
@@ -86,24 +86,24 @@ jobs:
               " +
               (.result.details.runTestResult.failures[] |
               "| \(.name) | \(.methodName) | \(.message) | \(.stackTrace) |")
-            ' <<< ${{ steps.result.validationResult }})
+            ' <<< ${{ steps.result.outputs.validationResult }})
           fi
 
-          echo "output=$TEST_FAILURES" >> $GITHUB_OUTPUT
+          echo "content=$TEST_FAILURES" >> $GITHUB_OUTPUT
 
       - name: "Update check run"
         env:
           GH_TOKEN: ${{ github.token }}
           STATUS: $( ${{ steps.result.validationResult }} | jq '.result.success' | if . then "success" else "failure" end )
-          COMPLETION_DATE: $( ${{ steps.result.validationResult }} | jq '.result.completedDate' )
+          COMPLETION_DATE: $( ${{ steps.result.outputs.validationResult }} | jq '.result.completedDate' )
           MARKDOWN_CONTENT: |
             # Validation Summary\n\n
 
-            ${{ steps.component_errors.output }}\n\n
+            ${{ steps.component_errors.outputs.content }}\n\n
 
-            ${{ steps.component_successes.output }}\n\n
+            ${{ steps.component_successes.outputs.content }}\n\n
 
-            ${{ steps.test_errors.output }}
+            ${{ steps.test_errors.outputs.content }}
         run: |
           gh api -X PATCH -H "Accept: application/vnd.github+json" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
