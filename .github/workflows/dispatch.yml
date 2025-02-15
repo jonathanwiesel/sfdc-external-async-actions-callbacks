@@ -37,7 +37,7 @@ jobs:
       - name: "Build validation errors ouput"
         id: component_errors
         run: |
-          if [ "$(jq '.result.details.componentFailures | length' ./DEPLOY_RESULT.json ")" -gt 0 ]; then
+          if [ "$(jq '.result.details.componentFailures | length' ./DEPLOY_RESULT.json)" -gt 0 ]; then
             FAILURES=$(jq -r '
               "
               ## Component Errors
