@@ -53,7 +53,9 @@ jobs:
             ' <<< ${{ steps.result.outputs.validationResult }})
           fi
 
-          echo "content=$FAILURES" >> $GITHUB_OUTPUT
+          echo "content<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$FAILURES" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
 
       - name: "Build validation successes ouput"
         id: component_successes
@@ -71,7 +73,9 @@ jobs:
             ' <<< ${{ steps.result.outputs.validationResult }})
           fi
 
-          echo "content=$SUCCESSES" >> $GITHUB_OUTPUT
+          echo "content<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$SUCCESSES" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
 
       - name: "Build test errors ouput"
         id: test_errors
@@ -89,7 +93,9 @@ jobs:
             ' <<< ${{ steps.result.outputs.validationResult }})
           fi
 
-          echo "content=$TEST_FAILURES" >> $GITHUB_OUTPUT
+          echo "content<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$TEST_FAILURES" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
 
       - name: "Update check run"
         env:
