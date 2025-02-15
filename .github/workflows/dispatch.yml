@@ -27,7 +27,7 @@ jobs:
           echo ${{ secrets.SFDX_INTEGRATION_URL }} > ./SFDX_INTEGRATION_URL.txt
 
       - name: "Authenticate to Integration Org"
-        run: sf org login sfdx-url -f ./SFDX_INTEGRATION_URL.txt -a integration -d
+        run: sf org login sfdx-url -f ./SFDX_INTEGRATION_URL.txt -a integration -s
 
       - name: "Get validation result"
         id: result
