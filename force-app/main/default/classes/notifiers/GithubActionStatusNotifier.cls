@@ -1,6 +1,7 @@
 public with sharing class GithubActionStatusNotifier extends AbstractMonitorNotifier {
     
     private static final Integer SUCCESS_RESPONSE_CODE = 200;
+    private static final String CLI_JSON_STRING_PREPENDER = '@';
 
     public override void notify() {
 
@@ -28,7 +29,7 @@ public with sharing class GithubActionStatusNotifier extends AbstractMonitorNoti
 
         public DispatchRequestModel(MonitorRequest__c request) {
             
-            this.sourceModel = (SourceDataModel)JSON.deserialize(request.SourceData__c, SourceDataModel.class);
+            this.sourceModel = (SourceDataModel)JSON.deserialize(request.SourceData__c.remove(CLI_JSON_STRING_PREPENDER), SourceDataModel.class);
             this.client_payload = new DispatchPayloadModel(request, this.sourceModel);
             this.event_type = sourceModel.eventType;
         }

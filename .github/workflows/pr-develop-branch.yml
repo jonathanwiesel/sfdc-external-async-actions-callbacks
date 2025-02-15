@@ -77,7 +77,7 @@ jobs:
 
       - name: "Monitor deployment externally"
         env:
-          MONITOR_REQUEST_FREQUENCY: 10
+          MONITOR_REQUEST_FREQUENCY: 1
         run: |
           sf data create record --sobject MonitorRequest__c \
           --values "ActionId__c=${{ steps.deploy.outputs.deploymentId }} \

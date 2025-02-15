@@ -1,4 +1,4 @@
-public with sharing class ActionStatusChecker implements Queueable, Finalizer {
+public with sharing class ActionStatusChecker implements Queueable, Finalizer, Database.AllowsCallouts {
     
     private static final String REQUEST_STATUS_REQUESTED = 'Requested';
     private static final String REQUEST_STATUS_MONITORING = 'Monitoring';
