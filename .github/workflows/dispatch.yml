@@ -70,7 +70,7 @@ jobs:
               " +
               (.result.details.componentSuccesses[] | select(.fullName != "package.xml") | 
               "| \(.fullName) | \(.componentType) |")
-            ' <<< ${{ steps.result.outputs.validationResult }})
+            ' <<< "${{ steps.result.outputs.validationResult }}")
           fi
 
           echo "content<<EOF" >> "$GITHUB_OUTPUT"
@@ -90,7 +90,7 @@ jobs:
               " +
               (.result.details.runTestResult.failures[] |
               "| \(.name) | \(.methodName) | \(.message) | \(.stackTrace) |")
-            ' <<< ${{ steps.result.outputs.validationResult }})
+            ' <<< "${{ steps.result.outputs.validationResult }}")
           fi
 
           echo "content<<EOF" >> "$GITHUB_OUTPUT"
