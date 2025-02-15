@@ -32,11 +32,10 @@ jobs:
       - name: "Get validation result"
         id: result
         run: |
-          {
-            echo 'RESULT<<EOF'
-            sf project deploy report --job-id ${{ github.event.client_payload.actionId }} --json
-            echo EOF
-          } >> $GITHUB_OUTPUT
+          RESULT=$(sf project deploy report --job-id ${{ github.event.client_payload.actionId }} --json)
+          echo "validationResult<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$RESULT" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
 
       - name: "Build validation errors ouput"
         id: component_errors
