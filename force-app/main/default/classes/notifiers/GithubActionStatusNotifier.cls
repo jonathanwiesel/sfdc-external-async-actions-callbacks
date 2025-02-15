@@ -1,6 +1,6 @@
 public with sharing class GithubActionStatusNotifier extends AbstractMonitorNotifier {
     
-    private static final Integer SUCCESS_RESPONSE_CODE = 200;
+    private static final Integer SUCCESS_RESPONSE_CODE = 204;
     private static final String CLI_JSON_STRING_PREPENDER = '@';
 
     public override void notify() {
@@ -15,7 +15,10 @@ public with sharing class GithubActionStatusNotifier extends AbstractMonitorNoti
         HttpResponse res = new Http().send(req);
 
         if (res.getStatusCode() != SUCCESS_RESPONSE_CODE) {
-            throw new AbstractMonitorNotifier.MonitorNotifierException('Failed to notify Github for action ' + this.request.ActionId__c + ': ' + res.getBody());
+            throw new AbstractMonitorNotifier.MonitorNotifierException(
+                'Failed to notify Github for action ' + this.request.ActionId__c + ': \n' + 
+                'Status: '+ res.getStatusCode() + '\n ' + 
+                'Body: ' + res.getBody());
         }
     }
 
