@@ -50,7 +50,7 @@ jobs:
               " +
               (.result.details.componentFailures[] |
               "| \(.fullName) | \(.componentType) | \(.problem) | \(.lineNumber) | \(.columnNumber) |")
-            ' <<< ${{ steps.result.outputs.validationResult }})
+            ' <<< "${{ steps.result.outputs.validationResult }}")
           fi
 
           echo "content<<EOF" >> "$GITHUB_OUTPUT"
