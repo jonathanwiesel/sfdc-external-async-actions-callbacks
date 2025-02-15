@@ -57,7 +57,7 @@ jobs:
       - name: "Build validation successes ouput"
         id: component_successes
         run: |
-          if [ "$(jq '.result.details.componentSuccesses[] | select(.fullName != "package.xml") | length' ./DEPLOY_RESULT.json)" -gt 0 ]; then
+          if [ "$(jq '[.result.details.componentSuccesses[] | select(.fullName != "package.xml")] | length' ./DEPLOY_RESULT.json)" -gt 0 ]; then
             SUCCESSES=$(jq -r '
               "
               ## Component Successes
