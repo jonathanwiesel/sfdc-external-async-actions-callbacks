@@ -118,11 +118,13 @@ jobs:
           STATUS=$(jq '.result.success | if . then "success" else "failure" end' ./DEPLOY_RESULT.json )
           COMPLETION_DATE=$(jq '.result.completedDate' ./DEPLOY_RESULT.json)
 
+          echo ${{ env.MARKDOWN_CONTENT }} > ./CONTENT.md
+
           gh api -X PATCH -H "Accept: application/vnd.github+json" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
           /repos/${{ github.repository }}/check-runs/${{ github.event.client_payload.checkRunId }} \
-          -f 'conclusion=$STATUS' \ 
-          -f 'completed_at=$COMPLETION_DATE' \
-          -f 'output[title]="Validation Results"' \
-          -f 'output[summary]="${{ env.MARKDOWN_CONTENT }}"'
+          -f conclusion='$STATUS' \ 
+          -f completed_at='$COMPLETION_DATE' \
+          -f output[title]='Validation Results' \
+          -F 'output[summary]=@CONTENT.mc'
           
