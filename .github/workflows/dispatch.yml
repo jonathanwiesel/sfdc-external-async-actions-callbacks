@@ -45,8 +45,11 @@ jobs:
               | Full Name                | Component Type | Problem                                 | Line | Column |
               |--------------------------|----------------|-----------------------------------------|------|--------|
               " +
-              (.result.details.componentFailures[] |
-              "| \(.fullName) | \(.componentType) | \(.problem) | \(.lineNumber) | \(.columnNumber) |")
+              (
+                [.result.details.componentFailures[]] |
+                map("| \(.fullName) | \(.componentType) | \(.problem) | \(.lineNumber) | \(.columnNumber) |") |\
+                join("\n")
+              )
             ' ./DEPLOY_RESULT.json)
           fi
 
@@ -65,9 +68,12 @@ jobs:
               | Full Name                | Component Type |
               |--------------------------|----------------|
               " +
-              (.result.details.componentSuccesses[] | select(.fullName != "package.xml") | 
-              "| \(.fullName) | \(.componentType) |")
-            ' <<< ./DEPLOY_RESULT.json)
+              (
+                [.result.details.componentSuccesses[] | select(.fullName != "package.xml")] | 
+                map("| \(.fullName) | \(.componentType) |") |
+                join("\n")
+              )
+            ' ./DEPLOY_RESULT.json)
           fi
 
           echo "content<<EOF" >> "$GITHUB_OUTPUT"
@@ -85,8 +91,11 @@ jobs:
               | Class                | Method         | Message                                 | Stack         |
               |----------------------|----------------|-----------------------------------------|---------------|
               " +
-              (.result.details.runTestResult.failures[] |
-              "| \(.name) | \(.methodName) | \(.message) | \(.stackTrace) |")
+              (
+                [.result.details.runTestResult.failures[]] |
+                map("| \(.name) | \(.methodName) | \(.message) | \(.stackTrace) |") |
+                join("\n")
+              )
             ' ./DEPLOY_RESULT.json)
           fi
 
@@ -96,7 +105,7 @@ jobs:
 
       - name: "Update check run"
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.CLASSIC_PAT }}
           MARKDOWN_CONTENT: |
             # Validation Summary
 
