@@ -120,7 +120,9 @@ jobs:
 
           gh api -X PATCH -H "Accept: application/vnd.github+json" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
+          /repos/${{ github.repository }}/check-runs/${{ github.event.client_payload.checkRunId }} \
           -f 'conclusion=$STATUS' \ 
           -f 'completed_at=$COMPLETION_DATE' \
           -f 'output[title]="Validation Results"' \
-          /repos/${{ github.repository }}/check-runs/${{ github.event.client_payload.checkRunId }}
+          -f 'output[summary]="${{ env.MARKDOWN_CONTENT }}"' \
+          
