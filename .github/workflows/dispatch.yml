@@ -123,5 +123,4 @@ jobs:
           -f 'conclusion=$STATUS' \ 
           -f 'completed_at=$COMPLETION_DATE' \
           -f 'output[title]="Validation Results"' \
-          -f 'output[summary]="${{ env.MARKDOWN_CONTENT }}"' \
           /repos/${{ github.repository }}/check-runs/${{ github.event.client_payload.checkRunId }}
