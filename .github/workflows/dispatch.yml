@@ -39,12 +39,12 @@ jobs:
         run: |
           if [ "$(jq '.result.details.componentFailures | length' ./DEPLOY_RESULT.json)" -gt 0 ]; then
             FAILURES=$(jq -r '
-              "
-              ## Component Errors
+          "
+          ## Component Errors
 
-              | Full Name                | Component Type | Problem                                 | Line | Column |
-              |--------------------------|----------------|-----------------------------------------|------|--------|
-              " +
+          | Full Name                | Component Type | Problem                                 | Line | Column |
+          |--------------------------|----------------|-----------------------------------------|------|--------|
+          " +
               (
                 [.result.details.componentFailures[]] |
                 map("| \(.fullName) | \(.componentType) | \(.problem) | \(.lineNumber) | \(.columnNumber) |") |\
@@ -62,12 +62,12 @@ jobs:
         run: |
           if [ "$(jq '[.result.details.componentSuccesses[] | select(.fullName != "package.xml")] | length' ./DEPLOY_RESULT.json)" -gt 0 ]; then
             SUCCESSES=$(jq -r '
-              "
-              ## Component Successes
+          "
+          ## Component Successes
 
-              | Full Name                | Component Type |
-              |--------------------------|----------------|
-              " +
+          | Full Name                | Component Type |
+          |--------------------------|----------------|
+          " +
               (
                 [.result.details.componentSuccesses[] | select(.fullName != "package.xml")] | 
                 map("| \(.fullName) | \(.componentType) |") |
@@ -85,15 +85,15 @@ jobs:
         run: |
           if [ "$(jq '.result.details.runTestResult.failures | length' ./DEPLOY_RESULT.json)" -gt 0 ]; then
             TEST_FAILURES=$(jq -r '
-              "
-              ## Test Errors
+          "
+          ## Test Errors
 
-              | Class                | Method         | Message                                 | Stack         |
-              |----------------------|----------------|-----------------------------------------|---------------|
-              " +
+          | Class                | Method         | Message                                 | Stack         |
+          |----------------------|----------------|-----------------------------------------|---------------|
+          " +
               (
                 [.result.details.runTestResult.failures[]] |
-                map("| \(.name) | \(.methodName) | \(.message) | \(.stackTrace) |") |
+                map("| \(.name) | \(.methodName) | \(.message) | \(.stackTrace | gsub("\n"; "<br>")) |") |
                 join("\n")
               )
             ' ./DEPLOY_RESULT.json)
