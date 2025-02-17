@@ -125,6 +125,6 @@ jobs:
           /repos/${{ github.repository }}/check-runs/${{ github.event.client_payload.checkRunId }} \
           -f conclusion='$STATUS' \ 
           -f completed_at='$COMPLETION_DATE' \
-          -f output[title]='Validation Results' \
+          -f 'output[title]=Validation Results' \
           -F 'output[summary]=@CONTENT.md'
           
