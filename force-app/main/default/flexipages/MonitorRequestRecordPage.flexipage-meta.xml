@@ -111,16 +111,6 @@
                 <identifier>RecordActionId_cField</identifier>
             </fieldInstance>
         </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.ParentId__c</fieldItem>
-                <identifier>RecordParentId__cField</identifier>
-            </fieldInstance>
-        </itemInstances>
         <name>Facet-72fd1ea0-b43b-4f86-9ece-dbb201a99182</name>
         <type>Facet</type>
     </flexiPageRegions>
@@ -302,7 +292,7 @@
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>label</name>
-                    <value>Section</value>
+                    <value>Monitoring Info</value>
                 </componentInstanceProperties>
                 <componentName>flexipage:fieldSection</componentName>
                 <identifier>flexipage_fieldSection</identifier>
@@ -320,7 +310,7 @@
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>label</name>
-                    <value>Section</value>
+                    <value>Source Info</value>
                 </componentInstanceProperties>
                 <componentName>flexipage:fieldSection</componentName>
                 <identifier>flexipage_fieldSection2</identifier>

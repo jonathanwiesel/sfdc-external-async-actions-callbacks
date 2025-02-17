@@ -8,11 +8,17 @@ on:
       - "force-app/**"
 
 jobs:
-  validate-deployment-on-develop-org:
-    runs-on: trailheadapps-Ubuntu
+  trigger-deployment-validation-on-develop-org:
+    runs-on: ubuntu-latest
     permissions:
+      contents: read
       checks: write
     steps:
+      - name: "Install node"
+        uses: actions/setup-node@v3
+        with:
+          node-version: '23'
+      
       - name: "Install Salesforce CLI"
         run: |
           npm install @salesforce/cli --location=global
@@ -28,7 +34,7 @@ jobs:
       - name: "Checkout source code"
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.client_payload.ref }}
+          fetch-depth: 0
 
       - name: "Populate auth file with SFDX_URL secret of integration org"
         shell: bash
@@ -36,26 +42,20 @@ jobs:
           echo ${{ secrets.SFDX_INTEGRATION_URL }} > ./SFDX_INTEGRATION_URL.txt
 
       - name: "Authenticate to Integration Org"
-        run: sf org login sfdx-url -f ./SFDX_INTEGRATION_URL.txt -a integration -d
+        run: sf org login sfdx-url -f ./SFDX_INTEGRATION_URL.txt -a integration -s
 
       - name: "Create delta packages"
         run: |
           mkdir changed-sources
-          sf sgd source delta --to "HEAD" --from "HEAD^" --output changed-sources/ --generate-delta --source force-app/
+          sf sgd source delta --to "HEAD" --from "origin/develop" -o changed-sources/ --generate-delta -s force-app/
+          tree changed-sources
 
       - name: "Check-only deploy delta changes"
         id: deploy
         run: |
-          DEPLOY_RESULT=$(sf project deploy start \ 
-          -d "changed-sources/force-app" 
-          -l RunLocalTests \
-          --dry-run \
-          --json \
-          --async)
-          DEPLOYID=$(echo $DEPLOY_RESULT | jq '.result.id')
-          DEPLOYURL=$(echo $DEPLOY_RESULT | jq '.result.deployUrl')
+          DEPLOY_RESULT=$(sf project deploy start -d "changed-sources/force-app" -l RunLocalTests --dry-run --json --async --ignore-conflicts)
+          DEPLOYID=$(echo $DEPLOY_RESULT | jq -r '.result.id')
           echo "deploymentId=$DEPLOYID" >> $GITHUB_OUTPUT
-          echo "deploymentURL=$DEPLOYURL" >> $GITHUB_OUTPUT
 
       - name: "Generate check run"
         env:
@@ -64,10 +64,9 @@ jobs:
         run: |
           CHECKID=$(gh api -X POST -H "Accept: application/vnd.github+json" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
-          -f name='Check Deployment' \
-          -f head_sha='${{ github.event.pull_request.head.sha }}' \
-          -f details_url='${{ steps.deploy.outputs.deploymentURL }}'
-          -f external_id='${{ steps.deploy.outputs.deploymentId }}'
+          -f name="Check Deployment ${{ steps.deploy.outputs.deploymentId }}" \
+          -f head_sha=${{ github.event.pull_request.head.sha }} \
+          -f external_id=${{ steps.deploy.outputs.deploymentId }} \
           --jq '.id' \
           /repos/${{ github.repository }}/check-runs)
 
@@ -75,13 +74,13 @@ jobs:
 
       - name: "Monitor deployment externally"
         env:
-          MONITOR_REQUEST_FREQUENCY: 10,
+          MONITOR_REQUEST_FREQUENCY: 1
         run: |
           sf data create record --sobject MonitorRequest__c \
-          --values "ActionId__c='${{ steps.deploy.outputs.deploymentId }}' \
-          ActionType='Deploy' \
+          --values "ActionId__c=${{ steps.deploy.outputs.deploymentId }} \
+          ActionType__c='Deploy' \
           MonitorFrequency__c=${{ env.MONITOR_REQUEST_FREQUENCY }} \
           Provider__c='Github' \
           ParentId__c='${{ github.event.number }}' \
-          SourceData__c='{/"checkRunId/": /"${{ steps.checkrun.outputs.checkId }}/", /"repo/": /"${{ github.repository }}/", /"eventType/": /"deploy-check/"}' \
+          SourceData__c='@{\"checkRunId\": \"${{ steps.checkrun.outputs.checkId }}\", \"repo\": \"${{ github.repository }}\", \"eventType\": \"deploy-check\"}' \
           SourceId__c='${{ github.event.pull_request.head.sha }}'"
