@@ -47,7 +47,7 @@ jobs:
           " +
               (
                 [.result.details.componentFailures[]] |
-                map("| \(.fullName) | \(.componentType) | \(.problem) | \(.lineNumber) | \(.columnNumber) |") |\
+                map("| \(.fullName) | \(.componentType) | \(.problem) | \(.lineNumber) | \(.columnNumber) |") |
                 join("\n")
               )
             ' ./DEPLOY_RESULT.json)
