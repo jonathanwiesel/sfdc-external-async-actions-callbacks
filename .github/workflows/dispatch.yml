@@ -40,7 +40,7 @@ jobs:
           if [ "$(jq '.result.details.componentFailures | length' ./DEPLOY_RESULT.json)" -gt 0 ]; then
             FAILURES=$(jq -r '
           "
-          ## Component Errors
+          ### Component Errors
 
           | Full Name                | Component Type | Problem                                 | Line | Column |
           |--------------------------|----------------|-----------------------------------------|------|--------|
@@ -63,7 +63,7 @@ jobs:
           if [ "$(jq '[.result.details.componentSuccesses[] | select(.fullName != "package.xml")] | length' ./DEPLOY_RESULT.json)" -gt 0 ]; then
             SUCCESSES=$(jq -r '
           "
-          ## Component Successes
+          ### Component Successes
 
           | Full Name                | Component Type |
           |--------------------------|----------------|
@@ -86,7 +86,7 @@ jobs:
           if [ "$(jq '.result.details.runTestResult.failures | length' ./DEPLOY_RESULT.json)" -gt 0 ]; then
             TEST_FAILURES=$(jq -r '
           "
-          ## Test Errors
+          ### Test Errors
 
           | Class                | Method         | Message                                 | Stack         |
           |----------------------|----------------|-----------------------------------------|---------------|
@@ -107,8 +107,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           MARKDOWN_CONTENT: |
-            # Validation Summary
-
             ${{ steps.component_errors.outputs.content }}
 
             ${{ steps.component_successes.outputs.content }}
