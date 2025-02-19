@@ -1,6 +1,8 @@
 public with sharing class GithubActionStatusNotifier extends AbstractMonitorNotifier {
     
+    @TestVisible
     private static final Integer SUCCESS_RESPONSE_CODE = 204;
+    @TestVisible
     private static final String CLI_JSON_STRING_PREPENDER = '@';
 
     public override void notify() {
