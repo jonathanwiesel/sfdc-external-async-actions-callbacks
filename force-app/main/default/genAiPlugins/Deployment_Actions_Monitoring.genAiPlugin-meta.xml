@@ -9,7 +9,7 @@
         <functionName>EmployeeCopilot__QueryRecords</functionName>
     </genAiFunctions>
     <genAiPluginInstructions>
-        <description>Check for the Monitor Request records that match the user&apos;s search criteria and summarize the output</description>
+        <description>Check for the Monitor Request records that match the user&apos;s search criteria</description>
         <developerName>instruction_checkforth0</developerName>
         <language xsi:nil="true"/>
         <masterLabel>instruction_checkforth0</masterLabel>
