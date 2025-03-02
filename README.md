@@ -15,6 +15,7 @@ Currently limited to non scratch org development (due to difficulty to make the 
 - [AWS-based Delegated Polling Initial Solution](https://github.com/jonathanwiesel/sfdc-deploy-checker)
 - [Webhook Data Action Targets in Data Cloud](https://developer.salesforce.com/docs/atlas.en-us.c360a_api.meta/c360a_api/c360a_api_webhook_data_action_targets_in_customer_data_platform.htm)
 - [Apex-based DeployCallback Interface](https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_interface_Metadata_DeployCallback.htm)
+- [Scratch Org Snapshots](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_snapshots_intro.htm)
 - [GitHub Status Checks](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/about-status-checks)
 - [GitHub Repository Dispatch](https://docs.github.com/en/webhooks/webhook-events-and-payloads#repository_dispatch)
 - [GitHub Check Runs API](https://docs.github.com/en/rest/checks/runs?apiVersion=2022-11-28)
