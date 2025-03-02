@@ -2,8 +2,11 @@
   "orgName": "jonathanwiesel company",
   "language": "en_US",
   "edition": "Developer",
-  "features": ["EnableSetPasswordInApi"],
+  "features": ["EnableSetPasswordInApi", "Einstein1AIPlatform"],
   "settings": {
+    "einsteinGptSettings" : {
+      "enableEinsteinGptPlatform" : true
+    },
     "lightningExperienceSettings": {
       "enableS1DesktopEnabled": true
     },
