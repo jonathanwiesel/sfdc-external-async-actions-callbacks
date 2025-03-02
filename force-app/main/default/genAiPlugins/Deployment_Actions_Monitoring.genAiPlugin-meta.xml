@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPlugin xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Interact with users regarding information related with platform asynchronous actions that have been submitted to the current Salesforce environment, such as deployments, validations, apex test runs and package installations.</description>
+    <developerName>Deployment_Actions_Monitoring</developerName>
+    <genAiFunctions>
+        <functionName>EmployeeCopilot__IdentifyRecordByName</functionName>
+    </genAiFunctions>
+    <genAiFunctions>
+        <functionName>EmployeeCopilot__QueryRecords</functionName>
+    </genAiFunctions>
+    <genAiPluginInstructions>
+        <description>Check for the Monitor Request records that match the user&apos;s search criteria</description>
+        <developerName>instruction_checkforth0</developerName>
+        <language xsi:nil="true"/>
+        <masterLabel>instruction_checkforth0</masterLabel>
+    </genAiPluginInstructions>
+    <language>en_US</language>
+    <masterLabel>Deployment Actions Monitoring</masterLabel>
+    <pluginType>Topic</pluginType>
+    <scope>Your job is to interact and answer questions for the user about past or ongoing deployments or validations.</scope>
+</GenAiPlugin>
