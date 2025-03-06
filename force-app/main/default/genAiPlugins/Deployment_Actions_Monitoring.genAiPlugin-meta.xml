@@ -3,9 +3,6 @@
     <description>Interact with users regarding information related with platform asynchronous actions that have been submitted to the current Salesforce environment, such as deployments, validations, apex test runs and package installations.</description>
     <developerName>Deployment_Actions_Monitoring</developerName>
     <genAiFunctions>
-        <functionName>EmployeeCopilot__IdentifyRecordByName</functionName>
-    </genAiFunctions>
-    <genAiFunctions>
         <functionName>EmployeeCopilot__QueryRecords</functionName>
     </genAiFunctions>
     <genAiPluginInstructions>
